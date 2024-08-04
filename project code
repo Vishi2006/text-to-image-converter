@@ -1,0 +1,57 @@
+import requests
+import io
+from PIL import Image, ImageTk
+import tkinter as tk
+from tkinter import ttk
+
+# Define the API URL and headers with your Hugging Face token
+API_URL = "https://api-inference.huggingface.co/models/CompVis/stable-diffusion-v1-4"
+headers = {"Authorization": "Bearer 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"}
+
+# Function to query the Hugging Face API
+def query(payload):
+    response = requests.post(API_URL, headers=headers, json=payload)
+    if response.status_code == 200:
+        return response.content
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
+        return None
+
+# Function to handle the button click and display the image
+def generate_image():
+    user_input = text_entry.get()
+    if user_input:
+        image_bytes = query({"inputs": user_input})
+        if image_bytes:
+            try:
+                image = Image.open(io.BytesIO(image_bytes))
+                image = image.resize((400, 400))  # Resize the image for display
+                img_tk = ImageTk.PhotoImage(image)
+                img_label.config(image=img_tk)
+                img_label.image = img_tk
+            except Image.UnidentifiedImageError:
+                print("Cannot identify image file. The response might not be an image.")
+        else:
+            img_label.config(text="No image bytes received.")
+    else:
+        img_label.config(text="Please enter some text.")
+
+# Set up the main window
+root = tk.Tk()
+root.title("Text-to-Image Converter")
+root.configure(background='#0096DC')
+
+# Create and place the text entry field
+text_entry = ttk.Entry(root, width=50)
+text_entry.grid(row=0, column=0, padx=10, pady=10)
+
+# Create and place the 'Generate Image' button
+generate_button = ttk.Button(root, text="Generate Image", command=generate_image)
+generate_button.grid(row=0, column=1, padx=10, pady=10)
+
+# Create and place the label to display the image
+img_label = ttk.Label(root, text="Your generated image will appear here.")
+img_label.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
+
+# Start the GUI event loop
+root.mainloop()
