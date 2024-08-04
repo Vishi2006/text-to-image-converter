@@ -1,0 +1,5 @@
+# text-to-image-converter
+This Python-based application that converts text prompts into images using the Hugging Face API and the Stable Diffusion model. 
+The project features a user-friendly graphical interface built with tkinter, allowing users to input text and instantly view the generated image.
+The application handles API requests, processes image data, and provides dynamic error handling, ensuring a smooth user experience.
+
